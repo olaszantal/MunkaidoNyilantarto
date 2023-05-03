@@ -30,6 +30,10 @@ const LoginPage = ({ setUserData }) => {
 
   const register = async () => {
     console.log('registering...');
+    if (password !== passwordConfirm) {
+      window.alert("Jelszók nem egyeznek!");
+      return;
+    }
     await signUp(email, password);
     const initialUserData = {
       name: userName,
