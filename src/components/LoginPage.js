@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { signIn, signUp } from '../auth';
+import { signIn, signUp, resetPassword } from '../auth';
 import { getUserDataByEmail, createUserData } from '../database';
 
 const LoginPage = ({ setUserData }) => {
@@ -43,6 +43,23 @@ const LoginPage = ({ setUserData }) => {
     };
     await createUserData(initialUserData);
     setUserData(initialUserData);
+  };
+
+  const checkForeignPassword = () => {
+    if (email === '') {
+      window.alert("Töltsd ki az email címedet, majd nyomd meg újra ezt a gombot!");
+      return;
+    } else if (!String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )) {
+      window.alert("Az email cím nem megfelelő formátumú!");
+      return;
+    } else {
+      resetPassword(email)
+      setEmail('');
+    }
   };
 
   return (
@@ -97,6 +114,9 @@ const LoginPage = ({ setUserData }) => {
             onChangeText={setPassword}
             secureTextEntry={true}
           />
+          <TouchableOpacity style={{ marginBottom: '1rem' }} onPress={checkForeignPassword}>
+            <Text style={{ textAlign: 'right', fontStyle: 'italic' }}>elfelejtett jelszó</Text>
+          </TouchableOpacity>
           {isSignUpActive && (
             <TextInput
               style={styles.input}
@@ -112,8 +132,8 @@ const LoginPage = ({ setUserData }) => {
             <Button title="Bejelentkezés" onPress={login} />
           )}
         </View>
-      </KeyboardAwareScrollView>
-    </View>
+      </KeyboardAwareScrollView >
+    </View >
   );
 };
 
