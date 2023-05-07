@@ -1,14 +1,30 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Switch, Image } from 'react-native';
 
 import { signOutUser } from '../auth';
 import { addHistory, updateUserState } from '../database';
 
 const StatusPage = ({ navigation: { navigate }, userData, setUserData }) => {
+  const [link, setLink] = useState('');
   const handleLogout = async () => {
     await signOutUser();
     setUserData(null);
   };
+
+  const generateImage = async () => {
+    const response = await fetch(`https://inspirobot.me/api?generate=true`);
+    const data = await response.text();
+    setLink(data);
+  };
+
+
+  useEffect(() => {
+    generateImage();
+  }, []);
+
+  useEffect(() => {
+    generateImage();
+  }, [userData.currentState]);
 
   const toggleSwitch = () => {
     let newState = '';
@@ -43,6 +59,9 @@ const StatusPage = ({ navigation: { navigate }, userData, setUserData }) => {
       <TouchableOpacity onPress={() => navigate('Napló')} style={[styles.button, styles.shadow]}>
         <Text style={styles.buttonText}>Napló megtekintése</Text>
       </TouchableOpacity>
+      <View>
+        <Image style={styles.image} source={{ uri: link }} />
+      </View>
     </View>
   );
 };
@@ -96,6 +115,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+  },
+  image: {
+    width: 400,
+    height: 400,
+    resizeMode: 'contain',
   },
 });
 
