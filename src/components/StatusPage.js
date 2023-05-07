@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Switch, Image } from 'react-n
 
 import { signOutUser } from '../auth';
 import { addHistory, updateUserState } from '../database';
+import SettingsPage from './SettingsPage';
 
 const StatusPage = ({ navigation: { navigate }, userData, setUserData }) => {
   const [link, setLink] = useState('');
@@ -41,9 +42,7 @@ const StatusPage = ({ navigation: { navigate }, userData, setUserData }) => {
   return (
     <View style={styles.container}>
       <View style={styles.logoutSection}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Kijelentkezés</Text>
-        </TouchableOpacity>
+        <SettingsPage handleLogout={handleLogout} />
       </View>
       <Text style={styles.appTitle}>Szia {userData.name}!</Text>
       <Text style={styles.statusText}>
