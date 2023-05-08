@@ -1,29 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Alert, TouchableOpacity, Modal, Button, Gap } from 'react-native';
 
-import { getHistory } from '../database';
+import { SvgXml } from 'react-native-svg';
+
+import trashIcon from '../../assets/Trash_font_awesome';
+import { getHistory, deleteHistoryById } from '../database';
 
 export default function HistoryPage(props) {
   const [history, setHistory] = useState([]);
+  const [currentId, setCurrentId] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
 
   const renderItem = ({ item, index }) => (
-    <View
-      style={[
-        styles.historyItemContainer,
-        styles.shadow,
-        item.state === 'in' ? styles.containerIn : styles.containerOut,
-      ]}>
-      <View style={styles.historyTextContainer}>
-        <Text style={styles.currentStateText}>{item.date.toDate().toLocaleString('hu-HU')}</Text>
-        <Text
-          style={[
+    <>
+      <Modal
+        onRequestClose={() => setIsVisible(false)}
+        transparent
+        visible={isVisible}
+      >
+        <View style={styles.containeralt}>
+          <Text style={{ textAlign: 'center' }}>
+            Biztos szeretné törölni?
+          </Text>
+          <View >
+            <Button onPress={() => {
+              setIsVisible(false);
+            }} title={'Mégsem'} />
+            <Button onPress={() => {
+              setIsVisible(false);
+              deleteHistoryById(props.userData.email, currentId);
+              let historyChunk = history.shift();
+              setHistory([...history]);
+            }} title={'Törlés'} buttonStyle={{ justifyContent: 'flex-end' }} />
+          </View>
+
+        </View>
+
+      </Modal>
+      <View
+        style={[
+          styles.historyItemContainer,
+          styles.shadow,
+          item.state === 'in' ? styles.containerIn : styles.containerOut,
+          styles.container
+        ]}>
+        <View style={[styles.historyTextContainer,]}>
+          <Text style={styles.currentStateText}>{item.date.toDate().toLocaleString('hu-HU')}</Text>
+
+          <Text style={[
             styles.currentStateText,
             item.state === 'in' ? styles.currentStateTextIn : styles.currentStateTextOut,
           ]}>
-          {item.state === 'in' ? 'bejött' : 'távozott'}
-        </Text>
+            {item.state === 'in' ? 'bejött' : 'távozott'}
+          </Text>
+        </View>
+        <TouchableOpacity onPress={() => { setCurrentId(item.id); setIsVisible(true); }}>
+          {index === 0 ? <div style={styles.trashIcon} dangerouslySetInnerHTML={{ __html: trashIcon }} /> : ''}
+        </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 
   useEffect(() => {
@@ -73,4 +109,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
+  containeralt: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: '#eee',
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    height: 300,
+    margin: 'auto',
+    padding: 30,
+    width: 300
+  },
+  gap: {
+    height: 10,
+  },
+  trashIcon: {
+    width: 20,
+    height: 20,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  }
 });
